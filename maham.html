@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
+  <title>Birthday Card</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #000;
+      font-family: 'Comic Sans MS', cursive;
+      color: #ff69b4;
+      text-align: center;
+      overflow: hidden;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    .content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+    }
+    .btn {
+      background-color: #ff69b4;
+      color: white;
+      padding: 15px 30px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(255, 105, 180, 0.5);
+      transition: 0.3s;
+      margin-top: 20px;
+    }
+    .btn:hover {
+      background-color: #ff1493;
+      transform: scale(1.05);
+    }
+    .image-popup, .card, .next-btn, .final-message {
+      display: none;
+    }
+    .image-popup {
+      flex-direction: column;
+      align-items: center;
+      background-color: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 25px #ff69b4;
+      animation: fadeIn 1s ease-in-out;
+      margin-top: 20px;
+    }
+    .image-popup img {
+      width: 300px;
+      border-radius: 15px;
+    }
+    .popup-message {
+      color: #ff1493;
+      font-size: 24px;
+      margin-top: 15px;
+    }
+    .card {
+      background-color: white;
+      border-radius: 20px;
+      box-shadow: 0 0 25px #ff69b4;
+      padding: 30px;
+      max-width: 600px;
+      color: #ff1493;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 30px;
+      animation: fadeIn 1s ease-in-out;
+      display: flex;
+    }
+    .message {
+      font-size: 20px;
+      min-height: 60px;
+      text-align: left;
+      flex: 1;
+    }
+    .jerry {
+      width: 100px;
+      height: auto;
+      border-radius: 10px;
+    }
+    .next-btn {
+      margin-top: 20px;
+      background-color: #ff69b4;
+      border: none;
+      color: white;
+      padding: 10px 25px;
+      font-size: 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #ff69b4;
+    }
+    .next-btn:hover {
+      background-color: #ff1493;
+    }
+    .final-message {
+      margin-top: 40px;
+      font-size: 24px;
+      color: #fff;
+      max-width: 600px;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @media only screen and (max-width: 600px) {
+      .card {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      }
+      .message {
+        text-align: center;
+      }
+      .jerry {
+        width: 80px;
+      }
+      .image-popup img {
+        width: 90%;
+      }
+    }
+
+    /* 🎈 Floating balloons */
+    .balloon {
+      position: fixed;
+      bottom: -100px;
+      width: 40px;
+      height: 60px;
+      background-color: #ff69b4;
+      border-radius: 50%;
+      animation: floatBalloons 10s linear infinite;
+      opacity: 0.7;
+      z-index: 1;
+    }
+    @keyframes floatBalloons {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+      100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+<canvas id="balloonCanvas"></canvas>
+<div class="content">
+  <h1>🎉 Happy Birthday !! 🎉</h1>
+  <button class="btn" onclick="showImage()">🎂 Click Me 🎂</button>
+  <div class="image-popup" id="imagePopup">
+    <img src="https://img1.hotstarext.com/image/upload/f_auto/sources/r1/cms/prod/2159/1736416462159-i" alt="Birthday Image">
+    <div class="popup-message">🎉 HAPPY BIRTHDAY !! To my oldest and goldest friend 🎈</div>
+    <button class="btn" onclick="openCard()">Open Your Card 💌</button>
+  </div>
+  <div class="card" id="card">
+    <div class="message" id="message"></div>
+    <img src="https://img1.hotstarext.com/image/upload/f_auto/sources/r1/cms/prod/2159/1736416462159-i" alt="Card Image" class="jerry">
+  </div>
+  <button class="next-btn" id="nextBtn" onclick="nextMessage()">Next 💖</button>
+  <div class="final-message" id="finalMessage">
+    🎀 Okayyy.. It's the end of your birthday wish but remember one thing:<br>
+    <strong>"No matter how much time passes, you’ll always be that childhood star in my sky" 💝</strong><br><br>
+    May your smile always shine like stars ✨<br><br>
+    — Tata By byyee and TAKE CARE, with love and chummi for you (hehehe)! 💖🌸
+  </div>
+  <audio id="music" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+const messages = [
+  "🎈 We grew up together, but you’ll always be my favorite kid at heart. Happy Birthday!🥳",
+  "💖 May your day be filled with sparkle, laughter, and love, ALLAH bless u with healthy and wealthy life (Ameeeen)!",
+  "😎 We’ve been through every silly, sweet, and serious moment—cheers to more!",
+  "🌟 You were born to do great things — keep going, queen!",
+  "Our friendship is 15 years old today too—because it grew with you🎊",
+  "Happy Birthday to the friend who’s been family for 15 years. Grateful for every moment!🎁🌟",
+  "🐭 Always shine bright like a star .. Lots of love and duas for you 💕"
+];
+let index = 0;
+function showImage() {
+  document.querySelector('.btn').style.display = 'none';
+  document.getElementById('imagePopup').style.display = 'flex';
+}
+function openCard() {
+  document.getElementById('music').play();
+  document.getElementById('imagePopup').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'inline-block';
+  typeMessage(messages[index]);
+  confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+}
+function nextMessage() {
+  index++;
+  if (index < messages.length) {
+    typeMessage(messages[index]);
+  } else {
+    document.getElementById('card').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('finalMessage').style.display = 'block';
+  }
+}
+function typeMessage(text) {
+  const messageBox = document.getElementById("message");
+  const card = document.getElementById("card");
+  messageBox.textContent = "";
+  card.style.display = 'flex';
+  let i = 0;
+  const speed = 50;
+  function typing() {
+    if (i < text.length) {
+      messageBox.textContent += text.charAt(i);
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+// Background balloons
+function createBalloon() {
+  const balloon = document.createElement('div');
+  balloon.classList.add('balloon');
+  balloon.style.left = Math.random() * window.innerWidth + 'px';
+  balloon.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 75%)`;
+  document.body.appendChild(balloon);
+  setTimeout(() => balloon.remove(), 10000);
+}
+setInterval(createBalloon, 800);
+</script>
+</body>
+</html>
